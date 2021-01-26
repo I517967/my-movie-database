@@ -16,7 +16,6 @@ public class MovieControllerImpl implements MovieController {
         this.movieService = movieService;
     }
 
-
     @Override
     @GetMapping
     public List<Movie> getAllMovies(){

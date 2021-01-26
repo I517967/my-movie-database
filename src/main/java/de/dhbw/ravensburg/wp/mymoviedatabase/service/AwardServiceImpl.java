@@ -37,5 +37,10 @@ public class AwardServiceImpl implements AwardService {
         this.awardRepository.deleteById(id);
     }
 
+    @Override
+    public void removeById(Long awardId) {
+
+    }
+
 
 }

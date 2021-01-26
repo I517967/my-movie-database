@@ -10,4 +10,8 @@ public interface AwardService {
     List<Award> getAllAwards();
     Award updateAward(Award award);
     void deleteAward(long id);
+
+    void removeById(Long awardId);
+
+    List<Award> getAwards();
 }
