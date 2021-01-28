@@ -46,9 +46,9 @@ public class AwardControllerImpl implements AwardController {
     }
 
     @Override
-    @GetMapping("/{awardId")
-    public List<Award> getAwards() {
-        return this.awardService.getAllAwards();
+    @GetMapping("/{awardId}")
+    public Award getAwardById(@PathVariable("awardId") Long awardId) {
+        return this.awardService.getAwardById(awardId);
 
     }
 }

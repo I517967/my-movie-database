@@ -19,8 +19,8 @@ public interface AwardController {
     @DeleteMapping("/{awardId}")
     void deleteAward(@PathVariable("awardId") Long awardId);
 
-    @GetMapping("/{awardId")
-    public List<Award> getAllAwards();
+    @GetMapping("/{awardId}")
+    Award getAwardById(@PathVariable("awardId") Long awardId) ;
 
 }
 

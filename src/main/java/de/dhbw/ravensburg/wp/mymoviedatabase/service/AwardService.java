@@ -12,6 +12,4 @@ public interface AwardService {
     void deleteAward(long id);
 
     void removeById(Long awardId);
-
-    List<Award> getAwards();
 }
