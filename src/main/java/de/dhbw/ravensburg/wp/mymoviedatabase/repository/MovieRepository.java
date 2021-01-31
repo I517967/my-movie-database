@@ -6,15 +6,23 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByTitleContaining(String substring);
     List<Movie> findByImdbRatingGreaterThan(double rating);
+    List<Movie> findByPremiereDateAfter(LocalDate reference);
 
+    //müsste nichts reinschreiben, weil werden von Spring gesetzt?
     @Query("SELECT m FROM Movie m WHERE m.title like %:param1%")
     List<Movie> findAllMoviesBelongingToSeries(
             @Param("param1") String series);
+
+    @Query("SELECT m FROM Movie m WHERE m.duration < 2.3 and m.imdbRating > 7.0")
+    List<Movie> findAllMoviesByDurationShorterThanAndimbdRatingGraterThan();
+
+
 }
 

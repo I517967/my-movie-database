@@ -33,6 +33,7 @@ public class Movie {
 
     private double imdbRating;
 
+    //um die notwendigen Attribute nicht via Setter sondern Konstruktor zu übergeben, alle außer id die lassen wir selber setzen von Spring Data deshal muss man sda hier nicht befüllen
     public Movie(String title, double duration, LocalDate premiereDate,
                  String description, String trailerUrl, String coverImgUrl, double imdbRating ) {
 

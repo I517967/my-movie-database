@@ -9,9 +9,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
 @Component
-@Slf4j
+@Slf4j //hat darüber die log-Möglichkeit, kann so auch im log, also in der Konsole bestimmte Statements hervorheben
 public class ManualTestBean {
     // Vorsicht diese Klasse ist nur für Übungszwecke,
     // sie sollte nie in einer produktiven Applikation sein
@@ -23,7 +24,7 @@ public class ManualTestBean {
         this.movieRepository = movieRepository;
 
     }
-
+//fügt paar Filme ein, macht das über den Konstruktor, damit muss man nicht die ganzen Setter ausführen
     @EventListener(ApplicationReadyEvent.class)
     public void callController(){
         //Filme anlegen
@@ -81,18 +82,60 @@ public class ManualTestBean {
                 "https://upload.wikimedia.org/wikipedia/en/d/d4/Rogue_One%2C_A_Star_Wars_Story_poster.png",
                 7.8);
 
-        //Filme speichern
+        //Filme speichern alle auf einmal
         this.movieRepository.saveAll(Arrays.asList(movie_1,movie_2,movie_3,movie_4,movie_5,movie_6));
+
+        // auch mögl.: this.movieRepository.save(movie_1);
+        //             this.movieRepository.save(movie_2); -> darf nur nicht einen Film zweimal speichern
+
+        //this.movieRepository.save(movie_5);
 
         //Beispielabfragen
         log.info("----- Test Query 1: IMDB Rating > 7 -----");
         this.movieRepository.findByImdbRatingGreaterThan(7).
+
+                //Variation um Dynamische Elemente reinzubringen: bietet die Möglichkeit, dass wir auf den Typ verzichten können, fnagen gleich mit dem Variablennamen an,
+                //dann -> und { wenn man mehr als ein Statement hat sonst opt. können nach -> die Operation ausführen die wir machen wollen
                 forEach(movie->log.info(movie.getTitle()));
+
+                //notmale for-each-schleife: for(Movie movie: this.movieRepository.findByImbdRatingGreaterThan(7)){
+                //movie.getId();}
+
+
+        //log.info gibt einfach nur etwas in der Konsole aus
         log.info("----- Test Query 2: Title contains 'Star' -----");
+        //finde alle Filme die etwas mit Star in sich tragen
         this.movieRepository.findByTitleContaining("Star").
                 forEach(movie->log.info(movie.getTitle()));
+
+
+        log.info("------------------------------------------");
+        List<Movie> potentialMovies = this.movieRepository.findByTitleContaining("Star Wars: Der Aufstieg Skywalkers");
+        if(potentialMovies.size() == 1){
+            Movie toBeChanged = potentialMovies.get(0);
+            toBeChanged.setTitle("Star Wars: Rise of the Skywalker");
+            this.movieRepository.save(toBeChanged);
+            //oder einfach nur: movie_5.setTitle("Star Wars: Rise of the Skywalker");
+            //                  this.movieRepository.save(movie_5);
+            //zum testen in Konsole ausgeben: log.info(movie_5.getTitle());
+        }
+
+
+        //log.info gibt einfach nur etwas in der Konsole aus
+        log.info("----- Test Query 3: Check Modifications -----");
+        //finde alle Filme die etwas mit Star in sich tragen
+        this.movieRepository.findByTitleContaining("Star").
+                forEach(movie->log.info(movie.getTitle()));
+
+
+        log.info("---- Test Query 4: Show all movietitles after 2015 ----");
+        this.movieRepository.findByPremiereDateAfter(LocalDate.of(2015,1,1)).
+                forEach(movie->log.info(movie.getTitle()));
+
+        log.info("---- Test Query 5: Movies shorter 2h30min and imbd rating > 7 ----");
+        this.movieRepository.findAllMoviesByDurationShorterThanAndimbdRatingGraterThan().
+                forEach(movie->log.info(movie.getTitle()));
+
     }
-
-
 
 }
