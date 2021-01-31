@@ -18,21 +18,30 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 public class MovieControllerImplTest {
 
-    @Autowired
+    @Autowired // wir testen den movieController, deshalb holen wir uns den her mit dem @Autowired
     MovieController movieController;
 
     //Durch MockBean wird automatisch ein Mock für die Klasse erzeugt
-    @MockBean
+    @MockBean //Definition der MockBean -> sind im Controller, der hat zwangsweise immer Aufrufe zu dem Service,
+            //also die Präsentationsschicht hat immer Aufrufe zu der Logikschicht, müssen diese irgendwie austauschen, machen wir indem wie @mockbean über den movieservice schreiben
+            //jetzt wird eine hohle  implementierung für das movieService Interface verwendet
     MovieService movieService;
 
     @Test
     public void shouldReturnEmptyMovieList(){
         //Reguläre When-Then Syntax, da keine void Methode aufgerufen wird
+        //machen gemäß der Stubdefinition eine Beschreibung des Antwortverhaltens, wie sich der MovieService bei einem Aufruf auf diesen MovieService verhalten sollte
+        //rufen erst den movieService, dann die Methode auf und übergeben ihr irgendeinen String, dann gebe eine leere Liste zurück, neue Instanziierung einer LinkedList
+        //damit ist der Stub definiert, haben unser Antwortverhalen angepasst, weil davor würden wir einfach nur null zrk bekommen
         when(movieService.getMovieTitles(anyString())).thenReturn(new LinkedList<>());
+        //rufen den movieController auf, die Methode mit dem Input(auf den kommt es beim Controller nicht so sehr an)
         List<String> result = this.movieController.getMovieTitles("man");
-        //Sicherstellen dass addMovieTitle aufgerufen wird
+        //Sicherstellen/überprüfen dass addMovieTitle aufgerufen wird (gemäß dem Mock), d.h dass der Controller den Service aufgerufen hat
+        // wir verifizieren , dass auf dem MovieSErvice die Methode getMovieTitles mit dem Parameter man auferufen wurde
         verify(movieService).getMovieTitles("man");
-        //Sicherstellen, dass der Controller eine leere Liste zurückgibt
+        //Sicherstellen, dass der Controller eine leere Liste zurückgibt,
+        //sicherstellen, dass mit dem Parameter richtig weiter gerechnet wird, hier: dass wieder eine leere Liste zrk gegeben wird
+        //haben oben def., dass der Service eine leere Liste zurückgeben soll und hier stellen wir sicher, dass der Controller dem Aufrufer auch tatsächlich eine leere Listse zrk gibt
         assertTrue(result.isEmpty());
     }
 
