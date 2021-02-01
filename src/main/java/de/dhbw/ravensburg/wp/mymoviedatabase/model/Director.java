@@ -26,7 +26,8 @@ public class Director {
 
     private String profileImgUrl;
 
-    @OneToMany(mappedBy = "director", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "director", cascade = CascadeType.ALL) //hier wird das Attribut der Eignerentität referenziert (director) kommt von Movie
+    //die Fremdschlüsselspalte heißt directior_id und der attributsname der eignereigentschaft heißt directior und wurde referenziertm mit mappedBy
     private List<Movie> movies;
 
     public Director(String surname, String forename, LocalDate dateOfBirth,

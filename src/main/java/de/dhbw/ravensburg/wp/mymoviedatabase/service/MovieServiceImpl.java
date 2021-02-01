@@ -59,10 +59,12 @@ public class MovieServiceImpl implements MovieService{
     @Transactional
     public void changeMovieTitle(long id, String newMovieName){
         Movie tmp = this.movieRepository.findById(id).get();
-        tmp.setTitle(newMovieName);
+        tmp.setTitle(newMovieName); //setzt hier schon den invaliden Stand und persistiert den
+
+        //die Condition greift nie, weil bevor man hier reinkommt setzt man den Titel ja schon, durch das Transactional würde er auch wenn er leer wäre hier schon gespeichert,
+        //das Speichern unten ist falsch, die Condition und das Speichern greifen nur wenn man das @Transactional weglässt
         if (!newMovieName.isEmpty()){
             this.movieRepository.save(tmp);
         }
     }
-
 }

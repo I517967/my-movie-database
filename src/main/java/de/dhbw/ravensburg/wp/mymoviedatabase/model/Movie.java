@@ -35,22 +35,22 @@ public class Movie {
     private double imdbRating;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="director_id", nullable = true)
-    private Director director;
+    @JoinColumn(name="director_id", nullable = true) //die Frendschlüsselspalte heißt director_id, das Gegenstück auf Seite der Referenz heißt director,
+    private Director director; //das hier (director) wird bei director referenziert
 
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL) //Tabellendef:
     @JoinTable(name = "movie_cast",
             joinColumns = {
                     @JoinColumn(name = "movie_id", referencedColumnName = "id",
                             updatable = false)},
             inverseJoinColumns = {
-                    @JoinColumn(name = "cast_id", referencedColumnName = "id",
+                    @JoinColumn(name = "cast_id", referencedColumnName = "id", //"cast_id" ist der name der Spalte in der neuerstellten Tabelle
                             updatable = false)})
-    private List<Cast> involvedCast;
+    private List<Cast> involvedCast; //referenziert nur den Attributsnamen des Eigners, ist sozusagen die Gegenseite der Referenz
 
 
-    @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL) //haben hier bei movie das mappedBy stehen, d.h. in dem Fall ist der Soundtrack der Eigner, nicht der Movie
     private Soundtrack soundtrack;
 
 
@@ -65,4 +65,8 @@ public class Movie {
         this.coverImgUrl = coverImgUrl;
         this.imdbRating = imdbRating;
     }
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    private List<Award> awards;
+
 }

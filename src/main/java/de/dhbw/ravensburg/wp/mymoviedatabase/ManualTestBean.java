@@ -1,10 +1,9 @@
 package de.dhbw.ravensburg.wp.mymoviedatabase;
 
-import de.dhbw.ravensburg.wp.mymoviedatabase.model.Cast;
-import de.dhbw.ravensburg.wp.mymoviedatabase.model.Director;
-import de.dhbw.ravensburg.wp.mymoviedatabase.model.Movie;
-import de.dhbw.ravensburg.wp.mymoviedatabase.model.Soundtrack;
+import de.dhbw.ravensburg.wp.mymoviedatabase.model.*;
+import de.dhbw.ravensburg.wp.mymoviedatabase.repository.AwardRepository;
 import de.dhbw.ravensburg.wp.mymoviedatabase.repository.MovieRepository;
+import de.dhbw.ravensburg.wp.mymoviedatabase.service.AwardService;
 import de.dhbw.ravensburg.wp.mymoviedatabase.service.MovieService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -22,11 +21,15 @@ public class ManualTestBean {
 
     MovieRepository movieRepository;
     MovieService movieService;
+    AwardRepository awardRepository;
+    AwardService awardService;
 
-    ManualTestBean(MovieRepository movieRepository, MovieService movieService)
+    ManualTestBean(MovieRepository movieRepository, MovieService movieService, AwardRepository awardRepository, AwardService awardService)
     {
         this.movieRepository = movieRepository;
         this.movieService = movieService;
+        this.awardRepository = awardRepository;
+        this.awardService = awardService;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -103,7 +106,7 @@ public class ManualTestBean {
 
 
         //----------------------
-        //Director anlegen
+        //Director anlegen, setzten auch hier keine Referenzen
         Director nolan = new Director("Nolan", "Christopher", LocalDate.of(1970,7,30),
                 null);
         Director wachowski = new Director("Wachowski", "Lana", LocalDate.of(1965,6,1),
@@ -114,7 +117,22 @@ public class ManualTestBean {
                 null);
 
         //----------------------
-        //Filme zuordnen
+        //neues Awardobjekt anlegen
+        Award oscar = new Award("MotionPicturesArtsAndSciences", "Action movie", 2016);
+        Award goldeneKamera = new Award("MovieAcademy", "best camera", 2018);
+
+        //Awards zuordnen, weißen den einzelnen Awards die Filme zu
+        oscar.setMovie(movie_1);
+        movie_1.setAwards(Arrays.asList(oscar));
+        this.movieRepository.save(movie_1);
+
+        goldeneKamera.setMovie(movie_2);
+        this.awardRepository.save(goldeneKamera);
+
+
+        //----------------------
+        //Filme zuordnen, weißen den einzelnen Filmen die Regisseure und Darsteller zu
+        //Movie war bisher immer außer bei Soundtrack der Eigner, d.h. wir können jetzt einfach nur diese Referenzen dem Movie zuordnen und später den Movie als solchen speichern
         movie_1.setDirector(nolan);
         movie_1.setInvolvedCast(Arrays.asList(mcConaughey));
 
@@ -135,14 +153,14 @@ public class ManualTestBean {
 
 
         //--------------------------------
-        //Soundtrack anlegen
+        //Soundtrack anlegen, haben den Soudtrack als Eigner, reicht nicht den nur anzulegen,
 
         Soundtrack sound_1 = new Soundtrack("Dreaming of the Crash", "Zimmer", "Hans",
                 LocalDate.of(2014, 11, 17));
         Soundtrack sound_2 = new Soundtrack("A Storm is Coming", "Zimmer", "Hans",
                 LocalDate.of(2012, 7, 17));
 
-        //Filme zuordnen
+        //Filme zuordnen, in dem Fall müssen wir auch den Soudtracks gegenseitig die Referenzen zuweisen
         movie_1.setSoundtrack(sound_1);
         movie_2.setSoundtrack(sound_2);
         //Wichtig: Soundtrack verantwortet Beziehung und nur Movie wird persistiert, daher beide Seiten setzten
@@ -150,11 +168,12 @@ public class ManualTestBean {
         sound_2.setMovie(movie_2);
 
 
-
-        //Filme speichern
+        //Filme speichern, erst jetzt den safe-Befehl ausführen
         this.movieRepository.saveAll(Arrays.asList(movie_1,movie_2,movie_3,movie_4,movie_5,movie_6));
 
 
+        //solange wir den Eigner persistieren reicht es wenn wir die Referenzen nur auf den eigner setzen, wenn wir aber das kind persistieren müssen wir immer die Eigner und die Gegensseite
+        //der REferenz setzen
         //Beispielabfragen
         log.info("----- Test Query 1: IMDB Rating > 7 -----");
         this.movieRepository.findByImdbRatingGreaterThan(7).
@@ -166,6 +185,9 @@ public class ManualTestBean {
         log.info("-----------movie cast--------");
         this.movieService.getCastOfMovie("Rises").
                 forEach(cast -> log.info(cast));
+
+        log.info("---- Test Query 3: Awards ----");
+
 
 
         //Speicherung leerer Titel wirft Exception und wird aufgrund der Transaktion dann nicht persistiert
